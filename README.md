@@ -10,3 +10,5 @@ A ideia é a seguinte, fazer com que cada modelo de carro tenha acelerações e 
 
 
 o código segurança e mobilidade ajuda o solicitante a verificar a segurança provida pelos veículos selecionados,visando a sua segurança geral e mobilidade caso seja necessário.(Izaque)
+
+o codigo de comparação dos modelos utilizados, compara as informações dados pelos outros codigos, para dar ao solicitante a resposta de qual veiculo seria melhor para comprar.(THAYS)
