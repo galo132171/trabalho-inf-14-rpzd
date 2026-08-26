@@ -9,3 +9,4 @@ O código compara a frenagem e os sistemas auxiliares do Civic, Dodge Ram, Palio
 A ideia é a seguinte, fazer com que cada modelo de carro tenha acelerações e frenagens diferentes entre sí, os carros escolhidos foram a Dodge Ram, Civic, Palio e Ferrari, e caso o usuário não escolha um carro que existe no jogo, deverá mostrar "Carro não encontrado", com o tempo de 0 a 100 dos carros.                                                                                        (Passos)
 
 
+o código segurança e mobilidade ajuda o solicitante a verificar a segurança provida pelos veículos selecionados,visando a sua segurança geral e mobilidade caso seja necessário(Izaque)
