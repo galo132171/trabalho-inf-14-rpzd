@@ -5,7 +5,7 @@
     "colab": {
       "provenance": [],
       "history_visible": true,
-      "authorship_tag": "ABX9TyNSwTqTeRK9BazbZXhVdRL0",
+      "authorship_tag": "ABX9TyPlG4PRMakS2bq2h3UfrkIU",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -560,65 +560,6 @@
       "metadata": {
         "id": "LaAiK9joMXSt"
       }
-    },
-    {
-      "cell_type": "code",
-      "source": [
-        "nome = \"Thays\"\n",
-        "idade1 = 18\n",
-        "idade2 = \"18\"\n",
-        "V_ou_F = True\n",
-        "print(nome, idade1, idade2)\n",
-        "print(nome)\n",
-        "print(idade1)\n",
-        "print(idade2)\n"
-      ],
-      "metadata": {
-        "colab": {
-          "base_uri": "https://localhost:8080/"
-        },
-        "collapsed": true,
-        "id": "gZrqpPJ8NSNu",
-        "outputId": "d2d5c3d6-3858-4f30-fb7a-1a6333f57ead"
-      },
-      "execution_count": null,
-      "outputs": [
-        {
-          "output_type": "stream",
-          "name": "stdout",
-          "text": [
-            "Thays 18 18\n",
-            "Thays\n",
-            "18\n",
-            "18\n"
-          ]
-        }
-      ]
-    },
-    {
-      "cell_type": "code",
-      "source": [
-        "nome = \"Thays\"\n",
-        "sobrenome = \"Oliveira\"\n",
-        "print (\"Bem vindo,\", nome, sobrenome)"
-      ],
-      "metadata": {
-        "colab": {
-          "base_uri": "https://localhost:8080/"
-        },
-        "id": "zdhlnOZzRML0",
-        "outputId": "8f1fc84c-e8d8-4226-93af-f91822e395c4"
-      },
-      "execution_count": null,
-      "outputs": [
-        {
-          "output_type": "stream",
-          "name": "stdout",
-          "text": [
-            "Bem vindo, Thays Oliveira\n"
-          ]
-        }
-      ]
     }
   ]
 }
