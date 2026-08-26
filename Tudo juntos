@@ -1,0 +1,305 @@
+from abc import ABC, abstractmethod
+import pandas as pd
+from typing import Dict, Optional
+
+
+# ==============================================================================
+# 1. ABSTRAÇÃO BASE (UNIFICAÇÃO DAS CLASSES ABSTRATAS)
+# ==============================================================================
+class SistemaVeicular(ABC):
+    """Contrato abstrato base obrigatório para o sistema veicular."""
+
+    @abstractmethod
+    def ligar_motor(self) -> None:
+        pass
+
+    @abstractmethod
+    def selecionar_terreno(self, modo: str) -> None:
+        pass
+
+    @abstractmethod
+    def exibir_resumo(self) -> None:
+        pass
+
+
+# ==============================================================================
+# 2. ENCAPSULAMENTO DE SEGURANÇA E MOBILIDADE
+# ==============================================================================
+class CarroSeguro(SistemaVeicular):
+    """Encapsula chave codificada, alarme, cinto de segurança e terrenos."""
+
+    def __init__(self, modelo: str, chave_codificada: str = "CHAVE-123"):
+        self.modelo = modelo
+        self.__chave_correta = chave_codificada
+        self.__alarme_ativo = True
+        self.__cinto_afivelado = False
+        self.__terreno_atual = "Asfalto"
+        self.__motor_ligado = False
+
+    def afivelar_cinto(self) -> None:
+        self.__cinto_afivelado = True
+        print(f"[{self.modelo} - SEGURANÇA] Cinto de segurança afivelado.")
+
+    def desativar_alarme(self, chave: str) -> bool:
+        if self.__validar_chave(chave):
+            self.__alarme_ativo = False
+            print(f"[{self.modelo} - SEGURANÇA] Alarme desativado com sucesso.")
+            return True
+        print(f"[{self.modelo} - ALERTA] Chave incorreta! Disparando alarme antifurto!")
+        return False
+
+    def ligar_motor(self) -> None:
+        if not self.__cinto_afivelado:
+            print(f"[{self.modelo} - BLOQUEIO] Não é possível ligar: Cinto desatado.")
+            return
+        if self.__alarme_ativo:
+            print(f"[{self.modelo} - BLOQUEIO] Não é possível ligar: Alarme ativado.")
+            return
+        self.__motor_ligado = True
+        print(f"[{self.modelo} - MOTOR] Motor ligado e pronto para rodar!")
+
+    def selecionar_terreno(self, modo: str) -> None:
+        terrenos = {
+            "Asfalto": "Tração 2WD padrão.",
+            "Lama": "Tração 4x4 com bloqueio de diferencial.",
+            "Areia": "Controle de tração ajustado para deslizamento.",
+            "Rochas": "Reduzida ativada e suspensão elevada."
+        }
+        if modo in terrenos:
+            self.__terreno_atual = modo
+            print(f"[{self.modelo} - TERRENO] Modo alterado para '{modo}': {terrenos[modo]}")
+        else:
+            print(f"[{self.modelo} - ERRO] Modo '{modo}' não suportado.")
+
+    def __validar_chave(self, chave: str) -> bool:
+        return chave == self.__chave_correta
+
+
+# ==============================================================================
+# 3. CLASSE CONCRETA DO VEÍCULO (DADOS TÉCNICOS + CUSTO-BENEFÍCIO)
+# ==============================================================================
+class Veiculo(CarroSeguro):
+    """Unifica especificações de desempenho, frenagem, notas C.B. e precificação."""
+
+    def __init__(
+        self,
+        marca: str,
+        modelo: str,
+        ano: int,
+        avaliacao: float,
+        aceleracao_ms2: float,
+        frenagem_ms2: float,
+        sistema_frenagem: str,
+        sistemas_auxiliares: str,
+        notas_cb: Dict[str, float],
+        preco: float = 0.0,
+        chave_codificada: str = "CHAVE-123"
+    ):
+        super().__init__(modelo=modelo, chave_codificada=chave_codificada)
+        self.marca = marca
+        self.ano = ano
+        self.avaliacao = avaliacao
+        self.aceleracao_ms2 = aceleracao_ms2
+        self.frenagem_ms2 = frenagem_ms2
+        self.sistema_frenagem = sistema_frenagem
+        self.sistemas_auxiliares = sistemas_auxiliares
+        self.__notas_cb = notas_cb
+        self.__preco = preco
+
+    @property
+    def preco(self) -> float:
+        return self.__preco
+
+    @preco.setter
+    def preco(self, novo_preco: float) -> None:
+        if novo_preco > 0:
+            self.__preco = novo_preco
+        else:
+            print("[Erro] O preço deve ser um valor positivo!")
+
+    def calcular_tempo_0_100(self) -> float:
+        return (100 / 3.6) / self.aceleracao_ms2 if self.aceleracao_ms2 > 0 else 0.0
+
+    def obter_nota_media(self) -> float:
+        return sum(self.__notas_cb.values()) / len(self.__notas_cb)
+
+    def calcular_custo_beneficio(self) -> float:
+        return (self.obter_nota_media() * 10000) / self.__preco if self.__preco > 0 else 0.0
+
+    def exibir_resumo(self) -> None:
+        print(f"\n==============================")
+        print(f"CARRO: {self.modelo} ({self.marca})")
+        print(f"Ano: {self.ano} | Avaliação: {self.avaliacao}/5.0")
+        print(f"Aceleração: {self.aceleracao_ms2} m/s² (0-100 km/h: {self.calcular_tempo_0_100():.2f}s)")
+        print(f"Frenagem: {self.sistema_frenagem} ({self.frenagem_ms2} m/s²)")
+        print(f"Sistemas Auxiliares: {self.sistemas_auxiliares}")
+
+    def obter_dados_dict(self) -> dict:
+        return {
+            "Marca": self.marca,
+            "Modelo": self.modelo,
+            "Ano": self.ano,
+            "Avaliação (0-5)": self.avaliacao,
+            "Aceleração (m/s²)": self.aceleracao_ms2,
+            "Tempo 0-100km/h (s)": round(self.calcular_tempo_0_100(), 2),
+            "Frenagem (m/s²)": self.frenagem_ms2,
+            "Tipo de Frenagem": self.sistema_frenagem,
+            "Sistemas Auxiliares": self.sistemas_auxiliares,
+            "Nota Média C.B.": round(self.obter_nota_media(), 1),
+            "Preço (R$)": self.__preco,
+            "Custo-Benefício": round(self.calcular_custo_beneficio(), 4)
+        }
+
+
+# ==============================================================================
+# 4. GERENCIADOR DE FROTA, BUSCA INTERATIVA E DECISÃO DE COMPRA
+# ==============================================================================
+class SistemaComparadorVeiculos:
+    """Gerencia a frota, entrada interativa de dados, buscas Pandas e recomendações."""
+
+    def __init__(self):
+        self.__frota: Dict[str, Veiculo] = {}
+
+    def adicionar_veiculo(self, veiculo: Veiculo) -> None:
+        self.__frota[veiculo.modelo.lower()] = veiculo
+
+    def obter_veiculo(self, nome: str) -> Optional[Veiculo]:
+        return self.__frota.get(nome.strip().lower(), None)
+
+    def cadastrar_precos_interativo(self) -> None:
+        """Solicita ao usuário os preços dos carros (com validação numérica)."""
+        print("\n=== COMPARADOR DE CUSTO-BENEFÍCIO (ENTRADA DE PREÇOS) ===")
+        for veiculo in self.__frota.values():
+            while True:
+                try:
+                    valor = float(input(f"Digite o preço da {veiculo.modelo} R$: "))
+                    if valor > 0:
+                        veiculo.preco = valor
+                        break
+                    print("Digite só número positivo.")
+                except ValueError:
+                    print("Digite só número. Ex: 85000")
+
+    def gerar_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame([v.obter_dados_dict() for v in self.__frota.values()])
+
+    def buscar_interativa(self, termo_busca: Optional[str] = None) -> None:
+        """Busca veículo na base por nome/marca com mensagem de erro caso não encontre."""
+        df = self.gerar_dataframe()
+        if not termo_busca:
+            termo_busca = input("\nEscolha o carro (ex: Civic, Ram, Palio, Ferrari): ").strip()
+        
+        termo = termo_busca.lower()
+        resultado = df[
+            df['Modelo'].str.lower().str.contains(termo, na=False) |
+            df['Marca'].str.lower().str.contains(termo, na=False)
+        ]
+
+        if not resultado.empty:
+            print(f"\nInformações encontradas para '{termo_busca}':")
+            try:
+                display(resultado)
+            except NameError:
+                print(resultado.to_string(index=False))
+        else:
+            print("\nCarro não encontrado!")
+
+    def exibir_ranking_custo_beneficio(self) -> None:
+        lista_veiculos = list(self.__frota.values())
+        if not lista_veiculos:
+            print("Nenhum veículo cadastrado.")
+            return
+
+        lista_veiculos.sort(key=lambda x: x.calcular_custo_beneficio(), reverse=True)
+
+        print("\n=== RANKING DE CUSTO-BENEFÍCIO ===")
+        for i, r in enumerate(lista_veiculos, 1):
+            cb = r.calcular_custo_beneficio()
+            print(f"{i}º - {r.modelo} (CB: {cb:.4f} | Preço: R$ {r.preco:,.2f})")
+
+        melhor = lista_veiculos[0]
+        print(f"\n>>> MELHOR ESCOLHA: {melhor.modelo} <<<")
+        print("Motivo: Maior nota pelo menor preço.")
+
+        modelo_lower = melhor.modelo.lower()
+        if "palio" in modelo_lower:
+            print("Recomendado para economia no dia a dia.")
+        elif "civic" in modelo_lower:
+            print("Recomendado para equilíbrio entre tudo.")
+        elif "ram" in modelo_lower:
+            print("Recomendado para força e conforto, se o preço compensar.")
+        else:
+            print("Recomendado se o foco é desempenho e status, não economia.")
+
+
+# ==============================================================================
+# 5. DEMONSTRAÇÃO DO SISTEMA TOTALMENTE UNIFICADO
+# ==============================================================================
+if __name__ == "__main__":
+    sistema = SistemaComparadorVeiculos()
+
+    # Cadastro dos 4 carros integrando todos os atributos dos scripts
+    v1 = Veiculo(
+        marca="Honda", modelo="Civic", ano=2022, avaliacao=4.8,
+        aceleracao_ms2=6.5, frenagem_ms2=9.0, sistema_frenagem="ABS e freios a disco",
+        sistemas_auxiliares="Controle de estabilidade e assistência de frenagem",
+        notas_cb={"desempenho": 7, "economia": 8, "manutencao": 8, "conforto": 8},
+        preco=140000.00
+    )
+
+    v2 = Veiculo(
+        marca="RAM", modelo="Dodge Ram", ano=2023, avaliacao=4.6,
+        aceleracao_ms2=5.0, frenagem_ms2=7.0, sistema_frenagem="ABS e freios a disco",
+        sistemas_auxiliares="Controle de estabilidade e assistência de frenagem",
+        notas_cb={"desempenho": 10, "economia": 3, "manutencao": 4, "conforto": 9},
+        preco=450000.00
+    )
+
+    v3 = Veiculo(
+        marca="Fiat", modelo="Palio", ano=2016, avaliacao=4.1,
+        aceleracao_ms2=2.0, frenagem_ms2=6.0, sistema_frenagem="Sistema ABS (dependendo da versão)",
+        sistemas_auxiliares="Controle de estabilidade (dependendo da versão)",
+        notas_cb={"desempenho": 4, "economia": 10, "manutencao": 9, "conforto": 5},
+        preco=35000.00
+    )
+
+    v4 = Veiculo(
+        marca="Ferrari", modelo="Ferrari", ano=2020, avaliacao=4.9,
+        aceleracao_ms2=10.0, frenagem_ms2=13.0, sistema_frenagem="Freios de alto desempenho",
+        sistemas_auxiliares="ABS, controle de estabilidade e assistência eletrônica",
+        notas_cb={"desempenho": 10, "economia": 1, "manutencao": 2, "conforto": 10},
+        preco=3500000.00
+    )
+
+    for v in [v1, v2, v3, v4]:
+        sistema.adicionar_veiculo(v)
+
+    # 1. Resumo individual dos veículos
+    print("=== 1. RESUMO INDIVIDUAL DOS VEÍCULOS ===")
+    for veiculo in [v1, v2, v3, v4]:
+        veiculo.exibir_resumo()
+
+    # 2. Teste de Segurança e Mobilidade (POO Encapsulamento)
+    print("\n=== 2. TESTE DE SEGURANÇA E MOBILIDADE (DODGE RAM) ===")
+    v2.ligar_motor()                  # Bloqueado por cinto/alarme
+    v2.desativar_alarme("CHAVE-ERRADA") # Chave incorreta
+    v2.desativar_alarme("CHAVE-123")  # Chave correta
+    v2.afivelar_cinto()               # Cinto afivelado
+    v2.ligar_motor()                  # Sucesso ao ligar
+    v2.selecionar_terreno("Lama")     # Troca de tração
+
+    # 3. Tabela Comparativa Completa via Pandas
+    print("\n=== 3. COMPARATIVO COMPLETO (DATAFRAME) ===")
+    df_frota = sistema.gerar_dataframe()
+    try:
+        display(df_frota)
+    except NameError:
+        print(df_frota.to_string(index=False))
+
+    # 4. Ranking de Custo-Benefício e Recomendação
+    print("\n=== 4. ANÁLISE E DECISÃO DE COMPRA ===")
+    sistema.exibir_ranking_custo_beneficio()
+
+    # 5. Busca Interativa de veículos
+    print("\n=== 5. BUSCA INTERATIVA ===")
+    sistema.buscar_interativa("Civic")
